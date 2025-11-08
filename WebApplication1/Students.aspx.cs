@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Linq;
 using System.Web.UI.WebControls;
-using System.Data.Entity; // Для метода Include [cite: 24]
-using System.Data.Entity.Infrastructure; // Для обработки ошибок БД
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using WebApp; // !!! ИСПРАВЛЕНИЕ: Model1Entities находится здесь !!!
 
 namespace WebApp
 {
-    // Убедитесь, что класс Person (генерируется EF из таблицы Person) доступен.
     public partial class Students : System.Web.UI.Page
     {
+        // 🔴 КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Ручное объявление элементов управления 
+        // Если designer-файлы не генерируются, это обязательно для устранения ошибок.
+        protected global::System.Web.UI.WebControls.Button btnAddStudent;
+        protected global::System.Web.UI.WebControls.GridView gvStudents;
+        protected global::System.Web.UI.WebControls.Label lblMessage;
+
         private string CurrentSortExpression
         {
             get { return ViewState["SortExpression"] as string ?? "LastName"; }
             set { ViewState["SortExpression"] = value; }
         }
-
+        // ... (CurrentSortDirection)
         private SortDirection CurrentSortDirection
         {
             get { return (SortDirection)(ViewState["SortDirection"] ?? SortDirection.Ascending); }
@@ -25,8 +31,6 @@ namespace WebApp
         {
             if (!IsPostBack)
             {
-                gvStudents.SortExpression = CurrentSortExpression;
-                gvStudents.SortDirection = CurrentSortDirection;
                 LoadStudents();
             }
         }
@@ -35,15 +39,13 @@ namespace WebApp
         {
             try
             {
-                using (var context = new SchoolEntities())
+                using (var context = new Model1Entities()) // !!! ИСПОЛЬЗУЕМ Model1Entities !!!
                 {
-                    [cite_start]// ТРЕБОВАНИЕ ВАРИАНТА 8: Include="StudentGrades, Courses" [cite: 68]
-                    // Загружаем связанные данные за один запрос (N+1 check)
-                    IQueryable<Person> query = context.People // People - стандартное название DbSet для таблицы Person
-                        .Include(p => p.StudentGrades) // Оценки
-                        .Include(p => p.Courses);      // Курсы (если связь многие-ко-многим настроена)
+                    IQueryable<Person> query = context.People
+                        .Include(p => p.StudentGrades)
+                        .Include(p => p.Courses);
 
-                    [cite_start]// Реализация сортировки (Sorting) [cite: 22]
+                    // Реализация сортировки (Sorting)
                     switch (CurrentSortExpression)
                     {
                         case "ID":
@@ -64,18 +66,17 @@ namespace WebApp
             }
             catch (Exception ex)
             {
-                [cite_start] ShowMessage($"Критическая ошибка загрузки данных: {ex.Message}", "error"); [cite: 52]
+                ShowMessage($"Критическая ошибка загрузки данных: {ex.Message}", "error");
             }
         }
 
-        [cite_start]// ОБРАБОТЧИКИ ПЕЙДЖИНГА (Paging) [cite: 22]
+        // ... (gvStudents_PageIndexChanging, gvStudents_Sorting)
         protected void gvStudents_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             gvStudents.PageIndex = e.NewPageIndex;
             LoadStudents();
         }
 
-        [cite_start]// ОБРАБОТЧИК СОРТИРОВКИ (Sorting) [cite: 22]
         protected void gvStudents_Sorting(object sender, GridViewSortEventArgs e)
         {
             if (e.SortExpression == CurrentSortExpression)
@@ -90,20 +91,11 @@ namespace WebApp
             LoadStudents();
         }
 
-        [cite_start]// ОБРАБОТЧИК КОМАНД (Удаление/Редактирование) [cite: 22]
         protected void gvStudents_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            int personId = Convert.ToInt32(e.CommandArgument);
-
             if (e.CommandName == "DeleteStudent")
             {
-                DeleteStudent(personId);
-            }
-            else if (e.CommandName == "EditStudent")
-            {
-                // Перенаправление на StudentsAdd для редактирования (функция не реализована в рамках базового CRUD)
-                ShowMessage($"Редактирование студента ID: {personId} (функция в разработке)", "warning");
-                // Response.Redirect($"~/StudentsAdd.aspx?ID={personId}");
+                DeleteStudent(Convert.ToInt32(e.CommandArgument));
             }
         }
 
@@ -111,46 +103,41 @@ namespace WebApp
         {
             try
             {
-                using (var context = new SchoolEntities())
+                using (var context = new Model1Entities())
                 {
                     var studentToDelete = context.People.FirstOrDefault(p => p.ID == personId);
-
                     if (studentToDelete != null)
                     {
-                        [cite_start]// Удаление: Сработает каскадное удаление StudentGrades благодаря настройке EDMX 
                         context.People.Remove(studentToDelete);
                         context.SaveChanges();
-
                         ShowMessage("Студент и все связанные записи успешно удалены.", "success");
                     }
                 }
             }
-            // Ловим ошибки БД, если каскадное удаление не сработало
             catch (DbUpdateException)
             {
-                [cite_start] ShowMessage($"Ошибка удаления: Убедитесь, что настроено каскадное удаление в SchoolModel.edmx.", "error"); [cite: 33]
+                ShowMessage($"Ошибка удаления: Убедитесь, что настроено каскадное удаление в Model1.edmx.", "error");
             }
             catch (Exception ex)
             {
-                [cite_start] ShowMessage($"Критическая ошибка: {ex.Message}", "error"); [cite: 52]
+                ShowMessage($"Критическая ошибка: {ex.Message}", "error");
             }
             finally
             {
-                LoadStudents(); // Перезагрузка списка [cite: 31]
+                LoadStudents();
             }
         }
 
         protected void btnAddStudent_Click(object sender, EventArgs e)
         {
-            [cite_start] Response.Redirect("~/StudentsAdd.aspx"); [cite: 25]
+            Response.Redirect("~/StudentsAdd.aspx");
         }
 
-        [cite_start]// Метод для вывода пользовательских сообщений [cite: 52]
         private void ShowMessage(string message, string type)
         {
             lblMessage.Text = message;
-            lblMessage.Visible = true;
-            // Стилизация (используем Bootstrap цвета)
+            lblMessage.Visible = !string.IsNullOrEmpty(message);
+
             switch (type)
             {
                 case "success":
@@ -158,15 +145,13 @@ namespace WebApp
                     lblMessage.Style["color"] = "#155724";
                     lblMessage.Style["border"] = "1px solid #c3e6cb";
                     break;
-                case "warning":
-                    lblMessage.Style["background-color"] = "#fff3cd";
-                    lblMessage.Style["color"] = "#856404";
-                    lblMessage.Style["border"] = "1px solid #ffeaa7";
-                    break;
                 case "error":
                     lblMessage.Style["background-color"] = "#f8d7da";
                     lblMessage.Style["color"] = "#721c24";
                     lblMessage.Style["border"] = "1px solid #f5c6cb";
+                    break;
+                case "reset":
+                    lblMessage.Style.Clear();
                     break;
             }
         }

@@ -1,6 +1,7 @@
 ﻿<%@ Page Title="Курсы" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Courses.aspx.cs" Inherits="WebApp.Courses" %>
+<%-- Убедитесь, что Inherits="WebApp.Courses" --%>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-    <h2 class="page-header">Курсы по кафедрам</h2>
+    <h2 class="page-header">Курсы по кафедрам (Filtering)</h2>
     <div class="card">
         <div style="margin-bottom: 20px;">
             <strong style="display: block; margin-bottom: 10px; font-size: 16px;">Выберите кафедру:</strong>

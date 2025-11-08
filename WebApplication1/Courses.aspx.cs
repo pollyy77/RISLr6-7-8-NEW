@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Linq;
 using System.Web.UI.WebControls;
+using WebApp; // !!! ИСПОЛЬЗУЕМ ВАШЕ ПРОСТРАНСТВО ИМЕН !!!
 
 namespace WebApp
 {
     public partial class Courses : System.Web.UI.Page
     {
+        // 🔴 КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Ручное объявление элементов управления
+        protected global::System.Web.UI.WebControls.DropDownList ddlDepartments;
+        protected global::System.Web.UI.WebControls.Label lblSelectedDepartment;
+        protected global::System.Web.UI.WebControls.GridView gvCourses;
+        protected global::System.Web.UI.WebControls.Label lblMessage;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -18,53 +25,49 @@ namespace WebApp
         {
             try
             {
-                using (var context = new SchoolEntities())
+                using (var context = new Model1Entities()) // !!! ИСПОЛЬЗУЕМ Model1Entities !!!
                 {
-                    // Загрузка списка кафедр (Departments) из EF
                     var departments = context.Departments
                         .OrderBy(d => d.Name)
                         .ToList();
 
-                    // Привязка данных (Предполагаем поля Name и ID)
                     ddlDepartments.DataSource = departments;
                     ddlDepartments.DataTextField = "Name";
                     ddlDepartments.DataValueField = "ID";
                     ddlDepartments.DataBind();
 
-                    // Добавление первого элемента
                     ddlDepartments.Items.Insert(0, new ListItem("-- Выберите кафедру --", ""));
                 }
             }
             catch (Exception ex)
             {
-                [cite_start] ShowMessage($"Ошибка загрузки списка кафедр: {ex.Message}", "error"); [cite: 52]
+                ShowMessage($"Ошибка загрузки списка кафедр: {ex.Message}", "error");
             }
         }
 
         protected void ddlDepartments_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Пытаемся распарсить ID. departmentId > 0 означает, что выбран реальный элемент
             if (int.TryParse(ddlDepartments.SelectedValue, out int departmentId) && departmentId > 0)
             {
-                [cite_start] lblSelectedDepartment.Text = $"Выбрана кафедра: {ddlDepartments.SelectedItem.Text}"; [cite: 32]
-                
+                lblSelectedDepartment.Text = $"Выбрана кафедра: {ddlDepartments.SelectedItem.Text}";
+
                 try
                 {
-                    using (var context = new SchoolEntities())
+                    using (var context = new Model1Entities())
                     {
-                        [cite_start]// ТРЕБОВАНИЕ: Фильтрация курсов по выбранной кафедре [cite: 26]
                         var courses = context.Courses
-                            .Where(c => c.DepartmentID == departmentId) // Предполагаем, что Course имеет поле DepartmentID
+                            .Where(c => c.DepartmentID == departmentId)
                             .OrderBy(c => c.Title)
                             .ToList();
 
                         gvCourses.DataSource = courses;
                         gvCourses.DataBind();
+                        ShowMessage(string.Empty, "reset");
                     }
                 }
                 catch (Exception ex)
                 {
-                    [cite_start] ShowMessage($"Ошибка загрузки курсов: {ex.Message}", "error"); [cite: 52]
+                    ShowMessage($"Ошибка загрузки курсов: {ex.Message}", "error");
                     gvCourses.DataSource = null;
                     gvCourses.DataBind();
                 }
@@ -72,22 +75,32 @@ namespace WebApp
             }
             else
             {
-                // Если выбран пустой элемент
                 lblSelectedDepartment.Text = "";
                 gvCourses.DataSource = null;
                 gvCourses.DataBind();
+                ShowMessage(string.Empty, "reset");
             }
         }
 
         private void ShowMessage(string message, string type)
         {
-            // Используем lblMessage, если он есть, или lblSelectedDepartment в качестве заглушки
-            Label targetLabel = (Page.FindControl("MainContent") as ContentPlaceHolder)?.FindControl("lblMessage") as Label;
-            if (targetLabel != null)
+            if (lblMessage != null)
             {
-                targetLabel.Text = message;
-                targetLabel.Visible = true;
-                // ... (Ваш код стилизации сообщений)
+                lblMessage.Text = message;
+                lblMessage.Visible = !string.IsNullOrEmpty(message);
+
+                switch (type)
+                {
+                    case "error":
+                        lblMessage.Style["background-color"] = "#f8d7da";
+                        lblMessage.Style["color"] = "#721c24";
+                        lblMessage.Style["border"] = "1px solid #f5c6cb";
+                        break;
+                    case "reset":
+                    default:
+                        lblMessage.Style.Clear();
+                        break;
+                }
             }
         }
     }

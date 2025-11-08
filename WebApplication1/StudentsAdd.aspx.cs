@@ -1,53 +1,57 @@
 ﻿using System;
 using System.Web.UI;
+using WebApp; // !!! ИСПРАВЛЕНИЕ: Model1Entities находится здесь !!!
 
 namespace WebApp
 {
     public partial class StudentsAdd : System.Web.UI.Page
     {
+        // 🔴 КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Ручное объявление элементов управления
+        protected global::System.Web.UI.WebControls.TextBox txtFirstName;
+        protected global::System.Web.UI.WebControls.TextBox txtLastName;
+        protected global::System.Web.UI.WebControls.TextBox txtEnrollmentDate;
+        protected global::System.Web.UI.WebControls.Label lblMessage;
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Устанавливаем текущую дату по умолчанию для поля Date
             if (!IsPostBack)
             {
+                // Устанавливаем сегодняшнюю дату по умолчанию
                 txtEnrollmentDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
             }
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
+            if (!Page.IsValid)
+            {
+                ShowMessage("Пожалуйста, заполните все обязательные поля.", "error");
+                return;
+            }
+
             try
             {
-                // Проверка входных данных
-                if (string.IsNullOrWhiteSpace(txtFirstName.Text) || string.IsNullOrWhiteSpace(txtLastName.Text))
-                {
-                    ShowMessage("Пожалуйста, заполните Имя и Фамилию.", "error");
-                    return;
-                }
-
                 if (!DateTime.TryParse(txtEnrollmentDate.Text, out DateTime enrollmentDate))
                 {
                     ShowMessage("Некорректный формат даты зачисления.", "error");
                     return;
                 }
 
-                [cite_start]// Вставка в БД через EF [cite: 25]
-                using (var context = new SchoolEntities())
+                using (var context = new Model1Entities()) // !!! ИСПОЛЬЗУЕМ Model1Entities !!!
                 {
-                    // Предполагаем, что Person - это класс студента
-                    var newStudent = new Person
+                    var newStudent = new Person // Person - сгенерированный класс
                     {
                         FirstName = txtFirstName.Text.Trim(),
                         LastName = txtLastName.Text.Trim(),
                         EnrollmentDate = enrollmentDate,
-                        // Устанавливаем Discriminator, если таблица Person используется для разных типов
+                        // Важно, если в вашей БД используется TPH (Table Per Hierarchy)
                         Discriminator = "Student"
                     };
 
-                    context.People.Add(newStudent); // People - DbSet для таблицы Person
+                    context.People.Add(newStudent);
                     context.SaveChanges();
 
-                    [cite_start] ShowMessage($"Студент {newStudent.FirstName} {newStudent.LastName} успешно добавлен в базу данных!", "success"); [cite: 31]
+                    ShowMessage($"Студент {newStudent.FirstName} {newStudent.LastName} успешно добавлен!", "success");
 
                     // Очистка формы
                     txtFirstName.Text = "";
@@ -57,7 +61,7 @@ namespace WebApp
             }
             catch (Exception ex)
             {
-                [cite_start] ShowMessage("Ошибка при сохранении данных: " + ex.Message, "error"); [cite: 52]
+                ShowMessage("Ошибка при сохранении данных: " + ex.Message, "error");
             }
         }
 
@@ -69,8 +73,24 @@ namespace WebApp
         private void ShowMessage(string message, string type)
         {
             lblMessage.Text = message;
-            lblMessage.Visible = true;
-            // ... (Ваш код стилизации сообщений)
+            lblMessage.Visible = !string.IsNullOrEmpty(message);
+
+            switch (type)
+            {
+                case "success":
+                    lblMessage.Style["background-color"] = "#d4edda";
+                    lblMessage.Style["color"] = "#155724";
+                    lblMessage.Style["border"] = "1px solid #c3e6cb";
+                    break;
+                case "error":
+                    lblMessage.Style["background-color"] = "#f8d7da";
+                    lblMessage.Style["color"] = "#721c24";
+                    lblMessage.Style["border"] = "1px solid #f5c6cb";
+                    break;
+                case "reset":
+                    lblMessage.Style.Clear();
+                    break;
+            }
         }
     }
 }
