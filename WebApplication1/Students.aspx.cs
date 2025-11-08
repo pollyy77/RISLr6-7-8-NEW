@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Linq;
-using System.Web.UI.WebControls;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using WebApp; // !!! ИСПРАВЛЕНИЕ: Model1Entities находится здесь !!!
+using System.Linq;
+using System.Web.UI.WebControls;
+using WebApp;
+using WebApplication1;
 
 namespace WebApp
 {
     public partial class Students : System.Web.UI.Page
     {
-        // 🔴 КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Ручное объявление элементов управления 
-        // Если designer-файлы не генерируются, это обязательно для устранения ошибок.
         protected global::System.Web.UI.WebControls.Button btnAddStudent;
         protected global::System.Web.UI.WebControls.GridView gvStudents;
         protected global::System.Web.UI.WebControls.Label lblMessage;
@@ -20,7 +19,7 @@ namespace WebApp
             get { return ViewState["SortExpression"] as string ?? "LastName"; }
             set { ViewState["SortExpression"] = value; }
         }
-        // ... (CurrentSortDirection)
+
         private SortDirection CurrentSortDirection
         {
             get { return (SortDirection)(ViewState["SortDirection"] ?? SortDirection.Ascending); }
@@ -39,24 +38,29 @@ namespace WebApp
         {
             try
             {
-                using (var context = new Model1Entities()) // !!! ИСПОЛЬЗУЕМ Model1Entities !!!
+                using (var context = new SchoolEntities())
                 {
-                    IQueryable<Person> query = context.People
-                        .Include(p => p.StudentGrades)
-                        .Include(p => p.Courses);
+                    IQueryable<Person> query = context.Person
+                        .Include(p => p.StudentGrade);
 
-                    // Реализация сортировки (Sorting)
+                    // Сортировка
                     switch (CurrentSortExpression)
                     {
-                        case "ID":
-                            query = (CurrentSortDirection == SortDirection.Ascending) ? query.OrderBy(p => p.ID) : query.OrderByDescending(p => p.ID);
+                        case "PersonID":
+                            query = (CurrentSortDirection == SortDirection.Ascending)
+                                ? query.OrderBy(p => p.PersonID)
+                                : query.OrderByDescending(p => p.PersonID);
                             break;
                         case "EnrollmentDate":
-                            query = (CurrentSortDirection == SortDirection.Ascending) ? query.OrderBy(p => p.EnrollmentDate) : query.OrderByDescending(p => p.EnrollmentDate);
+                            query = (CurrentSortDirection == SortDirection.Ascending)
+                                ? query.OrderBy(p => p.EnrollmentDate)
+                                : query.OrderByDescending(p => p.EnrollmentDate);
                             break;
                         case "LastName":
                         default:
-                            query = (CurrentSortDirection == SortDirection.Ascending) ? query.OrderBy(p => p.LastName) : query.OrderByDescending(p => p.LastName);
+                            query = (CurrentSortDirection == SortDirection.Ascending)
+                                ? query.OrderBy(p => p.LastName)
+                                : query.OrderByDescending(p => p.LastName);
                             break;
                     }
 
@@ -66,11 +70,11 @@ namespace WebApp
             }
             catch (Exception ex)
             {
-                ShowMessage($"Критическая ошибка загрузки данных: {ex.Message}", "error");
+                ShowMessage($"Ошибка загрузки данных: {ex.Message}", "error");
             }
         }
 
-        // ... (gvStudents_PageIndexChanging, gvStudents_Sorting)
+
         protected void gvStudents_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             gvStudents.PageIndex = e.NewPageIndex;
@@ -81,7 +85,9 @@ namespace WebApp
         {
             if (e.SortExpression == CurrentSortExpression)
             {
-                CurrentSortDirection = (CurrentSortDirection == SortDirection.Ascending) ? SortDirection.Descending : SortDirection.Ascending;
+                CurrentSortDirection = (CurrentSortDirection == SortDirection.Ascending)
+                    ? SortDirection.Descending
+                    : SortDirection.Ascending;
             }
             else
             {
@@ -103,20 +109,21 @@ namespace WebApp
         {
             try
             {
-                using (var context = new Model1Entities())
+                using (var context = new SchoolEntities())
                 {
-                    var studentToDelete = context.People.FirstOrDefault(p => p.ID == personId);
+                    var studentToDelete = context.Person.Find(personId); // безопасно для PK
+
                     if (studentToDelete != null)
                     {
-                        context.People.Remove(studentToDelete);
+                        context.Person.Remove(studentToDelete);
                         context.SaveChanges();
-                        ShowMessage("Студент и все связанные записи успешно удалены.", "success");
+                        ShowMessage("Студент успешно удалён.", "success");
                     }
                 }
             }
             catch (DbUpdateException)
             {
-                ShowMessage($"Ошибка удаления: Убедитесь, что настроено каскадное удаление в Model1.edmx.", "error");
+                ShowMessage("Ошибка удаления: возможно, не настроено каскадное удаление.", "error");
             }
             catch (Exception ex)
             {
@@ -127,6 +134,7 @@ namespace WebApp
                 LoadStudents();
             }
         }
+
 
         protected void btnAddStudent_Click(object sender, EventArgs e)
         {

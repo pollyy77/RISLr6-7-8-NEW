@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Web.UI;
-using WebApp; // !!! ИСПРАВЛЕНИЕ: Model1Entities находится здесь !!!
+using WebApp;
+using WebApplication1;
 
 namespace WebApp
 {
     public partial class StudentsAdd : System.Web.UI.Page
     {
-        // 🔴 КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Ручное объявление элементов управления
         protected global::System.Web.UI.WebControls.TextBox txtFirstName;
         protected global::System.Web.UI.WebControls.TextBox txtLastName;
         protected global::System.Web.UI.WebControls.TextBox txtEnrollmentDate;
@@ -16,7 +16,6 @@ namespace WebApp
         {
             if (!IsPostBack)
             {
-                // Устанавливаем сегодняшнюю дату по умолчанию
                 txtEnrollmentDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
             }
         }
@@ -37,18 +36,16 @@ namespace WebApp
                     return;
                 }
 
-                using (var context = new Model1Entities()) // !!! ИСПОЛЬЗУЕМ Model1Entities !!!
+                using (var context = new SchoolEntities())
                 {
-                    var newStudent = new Person // Person - сгенерированный класс
+                    var newStudent = new Person
                     {
                         FirstName = txtFirstName.Text.Trim(),
                         LastName = txtLastName.Text.Trim(),
-                        EnrollmentDate = enrollmentDate,
-                        // Важно, если в вашей БД используется TPH (Table Per Hierarchy)
-                        Discriminator = "Student"
+                        EnrollmentDate = enrollmentDate
                     };
 
-                    context.People.Add(newStudent);
+                    context.Person.Add(newStudent);
                     context.SaveChanges();
 
                     ShowMessage($"Студент {newStudent.FirstName} {newStudent.LastName} успешно добавлен!", "success");
@@ -58,6 +55,7 @@ namespace WebApp
                     txtLastName.Text = "";
                     txtEnrollmentDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
                 }
+
             }
             catch (Exception ex)
             {

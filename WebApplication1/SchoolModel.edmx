@@ -171,9 +171,10 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_StudentGrade_Student">
-          <End Role="Person" Type="Self.Person" Multiplicity="1" />
-          <End Role="StudentGrade" Type="Self.StudentGrade" Multiplicity="*" >
+          <End Role="Person" Type="Self.Person" Multiplicity="1" >
             <OnDelete Action="Cascade" />
+          </End>
+          <End Role="StudentGrade" Type="Self.StudentGrade" Multiplicity="*" >
           </End>
           <ReferentialConstraint>
             <Principal Role="Person">

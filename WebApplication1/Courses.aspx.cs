@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Web.UI.WebControls;
-using WebApp; // !!! ИСПОЛЬЗУЕМ ВАШЕ ПРОСТРАНСТВО ИМЕН !!!
+using WebApp;
+using WebApplication1;
 
 namespace WebApp
 {
     public partial class Courses : System.Web.UI.Page
     {
-        // 🔴 КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Ручное объявление элементов управления
         protected global::System.Web.UI.WebControls.DropDownList ddlDepartments;
         protected global::System.Web.UI.WebControls.Label lblSelectedDepartment;
         protected global::System.Web.UI.WebControls.GridView gvCourses;
@@ -25,9 +25,9 @@ namespace WebApp
         {
             try
             {
-                using (var context = new Model1Entities()) // !!! ИСПОЛЬЗУЕМ Model1Entities !!!
+                using (var context = new SchoolEntities())
                 {
-                    var departments = context.Departments
+                    var departments = context.Department
                         .OrderBy(d => d.Name)
                         .ToList();
 
@@ -53,9 +53,9 @@ namespace WebApp
 
                 try
                 {
-                    using (var context = new Model1Entities())
+                    using (var context = new SchoolEntities())
                     {
-                        var courses = context.Courses
+                        var courses = context.Course
                             .Where(c => c.DepartmentID == departmentId)
                             .OrderBy(c => c.Title)
                             .ToList();
@@ -71,7 +71,6 @@ namespace WebApp
                     gvCourses.DataSource = null;
                     gvCourses.DataBind();
                 }
-
             }
             else
             {
