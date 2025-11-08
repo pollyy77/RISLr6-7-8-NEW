@@ -172,7 +172,9 @@
         </Association>
         <Association Name="FK_StudentGrade_Student">
           <End Role="Person" Type="Self.Person" Multiplicity="1" />
-          <End Role="StudentGrade" Type="Self.StudentGrade" Multiplicity="*" />
+          <End Role="StudentGrade" Type="Self.StudentGrade" Multiplicity="*" >
+            <OnDelete Action="Cascade" />
+          </End>
           <ReferentialConstraint>
             <Principal Role="Person">
               <PropertyRef Name="PersonID" />
