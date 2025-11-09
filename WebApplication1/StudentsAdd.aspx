@@ -12,7 +12,7 @@
         </div>
         <div style="margin-bottom: 20px;">
             <label style="display: block; margin-bottom: 5px; font-weight: bold;">Дата зачисления:</label>
-            <%-- TextMode="Date" для современного выбора даты --%>
+            
             <asp:TextBox ID="txtEnrollmentDate" runat="server" TextMode="Date" Width="100%" CssClass="form-control" />
         </div>
         <div style="text-align: center;">

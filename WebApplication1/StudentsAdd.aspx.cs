@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Web.UI;
-using WebApp;
 using WebApplication1;
 
 namespace WebApp
@@ -22,7 +21,7 @@ namespace WebApp
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            if (!Page.IsValid)
+            if (string.IsNullOrWhiteSpace(txtFirstName.Text) || string.IsNullOrWhiteSpace(txtLastName.Text))
             {
                 ShowMessage("Пожалуйста, заполните все обязательные поля.", "error");
                 return;
@@ -42,20 +41,20 @@ namespace WebApp
                     {
                         FirstName = txtFirstName.Text.Trim(),
                         LastName = txtLastName.Text.Trim(),
-                        EnrollmentDate = enrollmentDate
+                        EnrollmentDate = enrollmentDate,
+                        HireDate = null  
                     };
 
-                    context.Person.Add(newStudent);
+                    context.Person.Add(newStudent);  
                     context.SaveChanges();
 
                     ShowMessage($"Студент {newStudent.FirstName} {newStudent.LastName} успешно добавлен!", "success");
 
-                    // Очистка формы
+                    
                     txtFirstName.Text = "";
                     txtLastName.Text = "";
                     txtEnrollmentDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
                 }
-
             }
             catch (Exception ex)
             {

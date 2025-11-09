@@ -1,12 +1,12 @@
 ﻿<%@ Page Title="Курсы" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Courses.aspx.cs" Inherits="WebApp.Courses" %>
-<%-- Убедитесь, что Inherits="WebApp.Courses" --%>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <h2 class="page-header">Курсы по кафедрам (Filtering)</h2>
     <div class="card">
         <div style="margin-bottom: 20px;">
             <strong style="display: block; margin-bottom: 10px; font-size: 16px;">Выберите кафедру:</strong>
             <asp:DropDownList ID="ddlDepartments" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ddlDepartments_SelectedIndexChanged" CssClass="form-control" style="width: 300px;">
-                <%-- Элементы будут заполнены из БД в Code-Behind --%>
+               
             </asp:DropDownList>
             <asp:Label ID="lblSelectedDepartment" runat="server" style="margin-left: 15px; font-weight: bold; color: #2c3e50;" />
         </div>

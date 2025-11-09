@@ -3,7 +3,6 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Web.UI.WebControls;
-using WebApp;
 using WebApplication1;
 
 namespace WebApp
@@ -40,8 +39,10 @@ namespace WebApp
             {
                 using (var context = new SchoolEntities())
                 {
-                    IQueryable<Person> query = context.Person
-                        .Include(p => p.StudentGrade);
+                    
+                    IQueryable<Person> query = context.Person  
+                        .Where(p => p.EnrollmentDate != null)  
+                        .Include(p => p.StudentGrade);        
 
                     // Сортировка
                     switch (CurrentSortExpression)
@@ -73,7 +74,6 @@ namespace WebApp
                 ShowMessage($"Ошибка загрузки данных: {ex.Message}", "error");
             }
         }
-
 
         protected void gvStudents_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
@@ -111,7 +111,7 @@ namespace WebApp
             {
                 using (var context = new SchoolEntities())
                 {
-                    var studentToDelete = context.Person.Find(personId); // безопасно для PK
+                    var studentToDelete = context.Person.Find(personId); 
 
                     if (studentToDelete != null)
                     {
@@ -135,6 +135,23 @@ namespace WebApp
             }
         }
 
+        
+        protected string GetGradesCount(object dataItem)
+        {
+            try
+            {
+                var person = dataItem as Person;
+                if (person != null && person.StudentGrade != null)
+                {
+                    return person.StudentGrade.Count.ToString();
+                }
+            }
+            catch
+            {
+                
+            }
+            return "0";
+        }
 
         protected void btnAddStudent_Click(object sender, EventArgs e)
         {

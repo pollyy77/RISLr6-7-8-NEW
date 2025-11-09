@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Web.UI.WebControls;
-using WebApp;
 using WebApplication1;
 
 namespace WebApp
@@ -27,13 +26,13 @@ namespace WebApp
             {
                 using (var context = new SchoolEntities())
                 {
-                    var departments = context.Department
+                    var departments = context.Department  
                         .OrderBy(d => d.Name)
                         .ToList();
 
                     ddlDepartments.DataSource = departments;
                     ddlDepartments.DataTextField = "Name";
-                    ddlDepartments.DataValueField = "ID";
+                    ddlDepartments.DataValueField = "DepartmentID";  
                     ddlDepartments.DataBind();
 
                     ddlDepartments.Items.Insert(0, new ListItem("-- Выберите кафедру --", ""));
@@ -55,7 +54,7 @@ namespace WebApp
                 {
                     using (var context = new SchoolEntities())
                     {
-                        var courses = context.Course
+                        var courses = context.Course  
                             .Where(c => c.DepartmentID == departmentId)
                             .OrderBy(c => c.Title)
                             .ToList();
