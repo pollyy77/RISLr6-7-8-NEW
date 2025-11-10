@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rentals>
+	<Rental>
+		<RentalID>1</RentalID>
+		<CardNo>C1234567</CardNo>
+		<ClientName>Иванов И.И.</ClientName>
+		<StartDate>2025-10-25</StartDate>
+		<EndDate>2025-10-27</EndDate>
+		<Amount>150.00</Amount>
+		<Fine>0.00</Fine>
+	</Rental>
+
+	<Rental>
+		<RentalID>2</RentalID>
+		<CardNo>C9876543</CardNo>
+		<ClientName>Петров П.П.</ClientName>
+		<StartDate>2025-10-20</StartDate>
+		<EndDate>2025-10-22</EndDate>
+		<Amount>200.00</Amount>
+		<Fine>0.00</Fine>
+	</Rental>
+
+	<Rental>
+		<RentalID>3</RentalID>
+		<CardNo>C5555555</CardNo>
+		<ClientName>Сидоров С.С.</ClientName>
+		<StartDate>2025-10-21</StartDate>
+		<EndDate>2025-10-25</EndDate>
+		<Amount>300.00</Amount>
+		<Fine>0.00</Fine>
+	</Rental>
+
+	<Rental>
+		<RentalID>4</RentalID>
+		<CardNo>C5555555</CardNo>
+		<ClientName>Сидоров С.С.</ClientName>
+		<StartDate>2025-10-26</StartDate>
+		<EndDate>2025-10-31</EndDate>
+		<Amount>100.00</Amount>
+		<Fine>0.00</Fine>
+	</Rental>
+
+	<Rental>
+		<RentalID>5</RentalID>
+		<CardNo>C4444444</CardNo>
+		<ClientName>Антонов А.А.</ClientName>
+		<StartDate>2025-11-05</StartDate>
+		<EndDate>2025-11-15</EndDate>
+		<Amount>120.00</Amount>
+		<Fine>0.00</Fine>
+	</Rental>
+</Rentals>
