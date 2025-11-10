@@ -45,7 +45,9 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rental.cs" />
     <Compile Include="RentalBase.cs" />
+    <Compile Include="Rental_Methods.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
