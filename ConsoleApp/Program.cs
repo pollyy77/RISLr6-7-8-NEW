@@ -102,9 +102,6 @@ public class Program
 
             Console.WriteLine($"Произошла критическая ошибка. Подробности записаны в файл {LogFilePath}");
         }
-
-        Console.WriteLine("\nНажмите любую клавишу для выхода...");
-        Console.ReadKey();
     }
     private static bool TryReadDate(string prompt, out DateTime date)
     {
