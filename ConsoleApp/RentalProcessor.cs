@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Globalization;
 
 public class RentalProcessor
 {
@@ -23,8 +24,8 @@ public class RentalProcessor
                 ClientName = x.Element("ClientName")?.Value,
                 StartDate = DateTime.Parse(x.Element("StartDate")?.Value),
                 EndDate = DateTime.Parse(x.Element("EndDate")?.Value),
-                AmountPaid = decimal.Parse(x.Element("Amount")?.Value),
-                Fine = decimal.Parse(x.Element("Fine")?.Value ?? "0.0")
+                AmountPaid = decimal.Parse(x.Element("Amount")?.Value, CultureInfo.InvariantCulture),
+                Fine = decimal.Parse(x.Element("Fine")?.Value ?? "0.0", CultureInfo.InvariantCulture)
             })
             .Where(Rental.IsValid)
             .ToList();
