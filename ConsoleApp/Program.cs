@@ -61,6 +61,34 @@ public class Program
         }
         Console.WriteLine("Отчёт revenue_period.txt успешно создан.");
 
+        using (StreamWriter sw = new StreamWriter("debtors.csv"))
+        {
+            sw.WriteLine("Карта Клиента,Просрочка (дни),Сумма Долга (Штраф)");
+
+            var today = DateTime.Today.Date;
+
+            foreach (var rental in rentals)
+            {
+                rental.CalculateTotalAmount(Rental.FineRate);
+            }
+
+            var debtors = rentals
+                .Where(r => r.IsOverdue(today) && r.Fine > 0)
+                .GroupBy(r => r.CardNo)
+                .Select(g => new
+                {
+                    CardNo = g.Key,
+                    MaxDelayDays = (int)g.Max(r => (today - r.EndDate).TotalDays),
+                    TotalDebt = g.Sum(r => r.Fine)
+                });
+
+            foreach (var debtor in debtors)
+            {
+                sw.WriteLine($"\"{debtor.CardNo.MaskCardNo()}\",{debtor.MaxDelayDays},{debtor.TotalDebt:F2}");
+            }
+        }
+        Console.WriteLine("Отчёт debtors.csv успешно создан.");
+
         Console.ReadKey();
     }
 }
