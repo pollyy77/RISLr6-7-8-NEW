@@ -70,24 +70,23 @@ namespace WebApp
         private void ShowMessage(string message, string type)
         {
             lblMessage.Text = message;
-            lblMessage.Visible = !string.IsNullOrEmpty(message);
+            lblMessage.Visible = true;
 
+            string baseClass = "alert ";
             switch (type)
             {
                 case "success":
-                    lblMessage.Style["background-color"] = "#d4edda";
-                    lblMessage.Style["color"] = "#155724";
-                    lblMessage.Style["border"] = "1px solid #c3e6cb";
+                    baseClass += "alert-success";
                     break;
                 case "error":
-                    lblMessage.Style["background-color"] = "#f8d7da";
-                    lblMessage.Style["color"] = "#721c24";
-                    lblMessage.Style["border"] = "1px solid #f5c6cb";
+                    baseClass += "alert-danger";
                     break;
-                case "reset":
-                    lblMessage.Style.Clear();
+                default:
+                    baseClass += "alert-secondary";
                     break;
             }
+
+            lblMessage.CssClass = baseClass + " show";
         }
     }
 }

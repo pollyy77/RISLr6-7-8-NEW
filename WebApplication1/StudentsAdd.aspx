@@ -1,25 +1,30 @@
 ﻿<%@ Page Title="Добавить студента" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="StudentsAdd.aspx.cs" Inherits="WebApp.StudentsAdd" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-    <h2 class="page-header">Добавить нового студента</h2>
-    <div class="card" style="max-width: 500px;">
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Имя:</label>
-            <asp:TextBox ID="txtFirstName" runat="server" Width="100%" MaxLength="50" CssClass="form-control" />
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-secondary text-white">
+            <h2>Добавить студента</h2>
         </div>
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Фамилия:</label>
-            <asp:TextBox ID="txtLastName" runat="server" Width="100%" MaxLength="50" CssClass="form-control" />
-        </div>
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Дата зачисления:</label>
-            
-            <asp:TextBox ID="txtEnrollmentDate" runat="server" TextMode="Date" Width="100%" CssClass="form-control" />
-        </div>
-        <div style="text-align: center;">
-            <asp:Button ID="btnSave" runat="server" Text="💾 Сохранить" OnClick="btnSave_Click" CssClass="btn btn-success" style="margin-right: 10px;" />
-            <asp:Button ID="btnCancel" runat="server" Text="❌ Отмена" OnClick="btnCancel_Click" CssClass="btn btn-secondary" />
+        <div class="card-body">
+            <asp:Label ID="lblMessage" runat="server" CssClass="alert" Visible="false" />
+
+            <div class="mb-3">
+                <label class="form-label">Имя:</label>
+                <asp:TextBox ID="txtFirstName" runat="server" CssClass="form-control form-control-lg" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Фамилия:</label>
+                <asp:TextBox ID="txtLastName" runat="server" CssClass="form-control form-control-lg" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Дата зачисления:</label>
+                <asp:TextBox ID="txtEnrollmentDate" runat="server" TextMode="Date" CssClass="form-control form-control-lg" />
+            </div>
+
+            <div class="d-flex gap-2 mb-3">
+                <asp:Button ID="btnSave" runat="server" Text="Сохранить" CssClass="btn btn-success btn-lg" OnClick="btnSave_Click" />
+                <asp:Button ID="btnCancel" runat="server" Text="Назад" CssClass="btn btn-outline-secondary btn-lg" OnClick="btnCancel_Click" />
+            </div>
         </div>
     </div>
-    
-    <asp:Label ID="lblMessage" runat="server" Visible="false" style="display: block; padding: 10px; margin-top: 15px; border-radius: 4px; text-align: center;" />
 </asp:Content>

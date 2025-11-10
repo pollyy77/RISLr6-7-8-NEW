@@ -39,27 +39,25 @@ namespace WebApp
             {
                 using (var context = new SchoolEntities())
                 {
-                    
-                    IQueryable<Person> query = context.Person  
-                        .Where(p => p.EnrollmentDate != null)  
-                        .Include(p => p.StudentGrade);        
+                    IQueryable<Person> query = context.Person
+                        .Where(p => p.EnrollmentDate != null)
+                        .Include(p => p.StudentGrade);
 
-                    // Сортировка
                     switch (CurrentSortExpression)
                     {
                         case "PersonID":
-                            query = (CurrentSortDirection == SortDirection.Ascending)
+                            query = CurrentSortDirection == SortDirection.Ascending
                                 ? query.OrderBy(p => p.PersonID)
                                 : query.OrderByDescending(p => p.PersonID);
                             break;
                         case "EnrollmentDate":
-                            query = (CurrentSortDirection == SortDirection.Ascending)
+                            query = CurrentSortDirection == SortDirection.Ascending
                                 ? query.OrderBy(p => p.EnrollmentDate)
                                 : query.OrderByDescending(p => p.EnrollmentDate);
                             break;
                         case "LastName":
                         default:
-                            query = (CurrentSortDirection == SortDirection.Ascending)
+                            query = CurrentSortDirection == SortDirection.Ascending
                                 ? query.OrderBy(p => p.LastName)
                                 : query.OrderByDescending(p => p.LastName);
                             break;
@@ -81,27 +79,14 @@ namespace WebApp
             LoadStudents();
         }
 
-        protected void gvStudents_Sorting(object sender, GridViewSortEventArgs e)
-        {
-            if (e.SortExpression == CurrentSortExpression)
-            {
-                CurrentSortDirection = (CurrentSortDirection == SortDirection.Ascending)
-                    ? SortDirection.Descending
-                    : SortDirection.Ascending;
-            }
-            else
-            {
-                CurrentSortExpression = e.SortExpression;
-                CurrentSortDirection = SortDirection.Ascending;
-            }
-            LoadStudents();
-        }
-
         protected void gvStudents_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             if (e.CommandName == "DeleteStudent")
             {
-                DeleteStudent(Convert.ToInt32(e.CommandArgument));
+                if (int.TryParse(e.CommandArgument.ToString(), out int personId))
+                {
+                    DeleteStudent(personId);
+                }
             }
         }
 
@@ -111,8 +96,7 @@ namespace WebApp
             {
                 using (var context = new SchoolEntities())
                 {
-                    var studentToDelete = context.Person.Find(personId); 
-
+                    var studentToDelete = context.Person.Find(personId);
                     if (studentToDelete != null)
                     {
                         context.Person.Remove(studentToDelete);
@@ -135,33 +119,32 @@ namespace WebApp
             }
         }
 
-        
+        // Этот метод не используется в текущей разметке, но оставлен на случай расширения
         protected string GetGradesCount(object dataItem)
         {
             try
             {
                 var person = dataItem as Person;
-                if (person != null && person.StudentGrade != null)
+                if (person?.StudentGrade != null)
                 {
                     return person.StudentGrade.Count.ToString();
                 }
             }
-            catch
-            {
-                
-            }
+            catch { }
             return "0";
-        }
-
-        protected void btnAddStudent_Click(object sender, EventArgs e)
-        {
-            Response.Redirect("~/StudentsAdd.aspx");
         }
 
         private void ShowMessage(string message, string type)
         {
+            if (string.IsNullOrEmpty(message))
+            {
+                lblMessage.Visible = false;
+                return;
+            }
+
             lblMessage.Text = message;
-            lblMessage.Visible = !string.IsNullOrEmpty(message);
+            lblMessage.Visible = true;
+            lblMessage.CssClass = "alert show"; // ⚠️ обязательно "show" из-за CSS в Site.Master
 
             switch (type)
             {
@@ -175,7 +158,7 @@ namespace WebApp
                     lblMessage.Style["color"] = "#721c24";
                     lblMessage.Style["border"] = "1px solid #f5c6cb";
                     break;
-                case "reset":
+                default:
                     lblMessage.Style.Clear();
                     break;
             }
