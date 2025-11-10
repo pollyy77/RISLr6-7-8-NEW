@@ -66,7 +66,7 @@ public class Program
             }
             Console.WriteLine("Отчёт revenue_period.txt успешно создан.");
 
-            using (StreamWriter sw = new StreamWriter("debtors.csv"))
+            using (StreamWriter sw = new StreamWriter("debtors.csv", false, Encoding.UTF8))
             {
                 sw.WriteLine("Карта Клиента,Просрочка (дни),Сумма Долга (Штраф)");
 
